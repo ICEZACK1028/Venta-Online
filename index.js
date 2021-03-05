@@ -37,7 +37,6 @@ mongoose.connect('mongodb://localhost:27017/VentaOnline', { useNewUrlParser: tru
         }
     })
 
-    app.listen(3000, function(){ 
-        console.log('Server on port 3000');
-    });
+    app.listen(3000, () => console.log('Server ready port: 3000... '));
+    
 }).catch(er => console.log(er));
