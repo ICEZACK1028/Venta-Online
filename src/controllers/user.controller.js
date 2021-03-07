@@ -93,7 +93,7 @@ createUser: function(req, res){
                         if(er) return res.status(500).send({ mensaje: 'error al guardar el usuario' });
 
                         if(userSaved){
-                            res.status(300).send(userSaved);
+                            res.status(200).send(userSaved);
                         }else{
                             res.status(404).send({ mensaje: 'No se ha podido crear el usuario' });
                         }
@@ -117,11 +117,25 @@ updateRol: function(req, res){
         if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error' });
         if(!userUpdated) return res.status(500).send({ mensaje: 'No se ha encontrado este usuario y / o este usuario es administrador' });
 
-        return res.status(500).send({ 'Usuario con nuevo rol': userUpdated });
+        return res.status(200).send({ 'Usuario con nuevo rol': userUpdated });
     });
 },
 
-//Función para editar rol de usuarios:
+//Función para eliminar rol de usuarios:
+deleteUserClient: function(req, res){
+    var idUser = req.params.idUser;
+
+    //Para verificar que sea rol administrador
+    if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Solo los administradores pueden eliminar clientes'});
+
+    //Buscamos el usuario cliente a eliminar
+    userModel.findOneAndDelete({_id : idUser, rol: 'Cliente'},(er, userDeleted)=>{
+        if(er) return res.status(500).send({ mensaje: 'Ha sucedido algo mal' });
+        if(!userDeleted) return res.status(500).send({ mensaje: 'No se ha encontrado este usuario y / o este usuario es administrador' });
+
+        return res.status(200).send({ 'Usuario eliminado': userDeleted });
+    })
+},
 
 //Función para editar usuarios:
 editUser: function(req, res){
@@ -139,21 +153,6 @@ editUser: function(req, res){
         if(!userUpdated) return res.status(500).send({ mensaje: 'No se ha podido actualizar el usuario' });
         return res.status(200).send({ 'Usuario actualizado' : userUpdated });
     });
-
-},
-
-//Función para eliminar usuarios:
-deleteUser: function(req, res){
-    var idUser = req.params.idUser;
-
-    //Verificar si es rol administrador
-    if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Solo el administrador puede eliminar clientes' });
-
-    userModel.findByIdAndDelete(idUser, (er, userDeleted)=>{
-        if(er) return res.status(500).send({ mensaje: 'Upss, algo mal ha sucedido :(' });
-        if(!userDeleted) return res.status(500).send({ mensaje: 'El id es incorrecto' });
-        return res.status(200).send({ 'Usuario eliminado': userDeleted });
-    })
 }
 
 }
