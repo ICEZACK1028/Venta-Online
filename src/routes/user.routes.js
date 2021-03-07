@@ -12,7 +12,8 @@ var api = express.Router();
 api.post('/registryUser', userController.registryUser);
 api.post('/login', userController.login);
 api.post('/createUser', md_autentication.ensureAuth,  userController.createUser);
+api.put('/updateRol/:idUser', md_autentication.ensureAuth, userController.updateRol);
 api.put('/editUser/:idUser', md_autentication.ensureAuth,  userController.editUser);
-api.delete('/deleteUser/:idUser', md_autentication.ensureAuth, userController.deleteUser);
+api.delete('/deleteUser/:idUser', md_autentication.ensureAuth, userController.deleteUserClient);
 
 module.exports = api;
