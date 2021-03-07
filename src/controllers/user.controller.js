@@ -70,6 +70,7 @@ createUser: function(req, res){
     var userBuilder = new userModel();
     var params = req.body;
 
+    //Verificar si es administrador
     if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Debes solicitar el rol administrador para realizar esta acción' });
 
     if(params.user && params.password){
@@ -108,20 +109,19 @@ updateRol: function(req, res){
     var idUser = req.params.idUser;
     var params = req.body;
 
-    //Que solo pueda editar el rol
-    delete params.user;
-    delete params.password;
-
     //Para verificar que sea rol administrador
+    if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Solo los administradores puede actualizar los roles' });
 
-    userModel.findByIdAndUpdate(idUser, params, {new: true, useFindAndModify: false}, (er, userUpdated)=>{
+    userModel.findOneAndUpdate({_id : idUser, rol: 'Cliente'},{ rol: params.rol }, {new: true, useFindAndModify: false}, (er, userUpdated)=>{
+        if(!params.rol) return res.status(500).send({ mensaje: 'Debe rellenar el campo rol' });
         if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error' });
-        if(!userUpdated) return res.status(500).send({ mensaje: 'No se ha podido encontrar este usuario, revisa el id' });
-        //Verificar que el usuario tenga rol cliente
-        if(userUpdated.rol != 'Cliente') return res.status(500).send({ mensaje: 'No puedes actualizar el rol de un administrador' });
+        if(!userUpdated) return res.status(500).send({ mensaje: 'No se ha encontrado este usuario y / o este usuario es administrador' });
+
         return res.status(500).send({ 'Usuario con nuevo rol': userUpdated });
     });
 },
+
+//Función para editar rol de usuarios:
 
 //Función para editar usuarios:
 editUser: function(req, res){
