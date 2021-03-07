@@ -101,6 +101,8 @@ createUser: function(req, res){
                 })
             }
         })
+    }else{
+        return res.status(500).send({ mensaje: `Debe rellenar los campos de 'user' y 'password' ` });
     }
 },
 
