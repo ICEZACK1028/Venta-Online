@@ -74,6 +74,9 @@ createUser: function(req, res){
     if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Debes solicitar el rol administrador para realizar esta acción' });
 
     if(params.user && params.password){
+        //Verificación para que solo se pueda agregar rol administrador y cliente
+        if(params.rol != 'Administrador' && params.rol != 'Cliente' ) return res.status(500).send({ mensaje: `Únicamente puedes agregar el rol 'Administrador' o 'Cliente'` });
+        
         userBuilder.user = params.user;
         userBuilder.rol = params.rol;
 
@@ -115,6 +118,7 @@ updateRol: function(req, res){
     if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Solo los administradores puede actualizar los roles' });
 
     userModel.findOneAndUpdate({_id : idUser, rol: 'Cliente'},{ rol: params.rol }, {new: true, useFindAndModify: false}, (er, userUpdated)=>{
+        if(params.rol != 'Administrador') return res.status(500).send({ mensaje: `Únicamente puedes ascender al usuario utilizando el rol 'Administrador'` });
         if(!params.rol) return res.status(500).send({ mensaje: 'Debe rellenar el campo rol' });
         if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error' });
         if(!userUpdated) return res.status(500).send({ mensaje: 'No se ha encontrado este usuario y / o este usuario es administrador' });
@@ -144,7 +148,8 @@ editUser: function(req, res){
     var idUser = req.params.idUser;
     var params = req.body;
 
-    //Evita el campo password
+    //Evita el campo password y rol
+    delete params.rol;
     delete params.password;
 
     //Evitar si es de rol administrador

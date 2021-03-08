@@ -3,8 +3,6 @@
 //Imports 
 
 const categoryModel = require('../models/category.model');
-const bcrypt = require('bcrypt-nodejs');
-const { NativeDate } = require('mongoose');
 
 module.exports ={
 
