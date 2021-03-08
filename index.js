@@ -49,7 +49,7 @@ mongoose.connect('mongodb://localhost:27017/VentaOnline', { useNewUrlParser: tru
         if(er) return res.status(500).send({ mensaje: '¡Error!' });
 
         if(categoryFound && categoryFound.length >=1){
-            return console.log( 'Categorys already exist');
+            return console.log( 'Category default already exist');
         }else{
             Category.save((er, categorySaved)=>{
                 if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error'});
