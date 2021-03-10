@@ -22,20 +22,26 @@ module.exports = {
             productBuilder.price = params.price;
             productBuilder.categoryId = idCategory;
 
-
-            productBuilder.save((er, newProduct)=>{
-                if(newProduct){
-                    return res.status(200).send({ 'Nuevo producto' : newProduct });
+            productModel.find({ name: productBuilder.name }).exec((er, productFound)=>{
+                if(er) return res.status(500).send({ mensaje: 'Vaya... hemos encontrado un error' });
+                
+                if(productFound && productFound.length >=1){
+                    return res.status(500).send({ mensaje: 'Ya existe un producto con el mismo nombre' });
                 }else{
-                    return res.status(500).send({ mensaje: 'No hemos podido guardar el producto' });
+                productBuilder.save((er, newProduct)=>{
+                    if(newProduct){
+                        return res.status(200).send({ 'Nuevo producto' : newProduct });
+                    }else{
+                        return res.status(500).send({ mensaje: 'No hemos podido guardar el producto' });
+                    }
+                });
                 }
-            });
-        }else{
-            return res.status(500).send({ mensaje: 'Debe llenar todos los campos para crear el producto' });
-            
-        }
-    },
-
+            })
+            }else{
+                return res.status(500).send({ mensaje: 'Debe llenar todos los campos para crear el producto' });
+            }
+        },
+        
     //Función para editar productos
     updateProduct: function(req,res){
         var idProduct = req.params.idProduct;

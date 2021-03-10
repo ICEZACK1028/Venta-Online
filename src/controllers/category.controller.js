@@ -1,13 +1,12 @@
 'use strict'
 
 //Imports 
-
 const categoryModel = require('../models/category.model');
+const productModel = require('../models/product.model');
 
-module.exports ={
 
     //Función para crear categorias
-    createCategory: function(req, res){
+    function createCategory(req, res){
         var categoryBuilder = new categoryModel() ;
         var params = req.body;
 
@@ -38,10 +37,37 @@ module.exports ={
         }else{
             return res.status(500).send({ mensaje: `Debe rellenar al menos el campo 'name' ` });
         }
-    },
+    }
+
+    //Función para crear la categoria por defecto
+    function createCategoryDefault(){
+        var Category = new categoryModel();
+        var name = 'default';
+        var description = '';
+
+        Category.name = name;
+        Category.description = description;
+
+        categoryModel.find({ name: Category.name }).exec((er, categoryFound)=>{
+            if(er) console.log({ mensaje: '¡Error!' });
+
+            if(categoryFound && categoryFound.length >=1){
+            }else{
+                Category.save((er, categorySaved)=>{
+                    if(er) console.log({ mensaje: 'Ha ocurrido un error'});
+
+                    if(categorySaved){
+                        console.log({ categorySaved });
+                    }else{
+                        console.log({ mensaje: 'No se ha podido crear la categoria ' });
+                    }
+                });
+            }
+        });
+    }
 
     //Función para listar categorias
-    listCategorys: function(req,res){
+    function listCategorys(req,res){
 
         //Verificar si el usuario logueado es administrador
         if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Solo los administradores tienen permisos para esta acción'}); 
@@ -52,10 +78,10 @@ module.exports ={
 
             return res.status(500).send({ 'Categorias encontradas': categoryFound });
         })
-    },
+    }
 
     //Función para editar categorias
-    editCategory: function(req,res){
+    function editCategory(req,res){
         var idCategory = req.params.idCategory;
         var params = req.body;
 
@@ -68,22 +94,40 @@ module.exports ={
 
             return res.status(200).send({ 'Categoria actualizada correctamente': categoryFound });
         })
-    },
+    }
 
     //Función para eliminar categorias
-    deleteCategory: function(req,res){
+    function deleteCategory(req,res){
         var idCategory = req.params.idCategory;
         
         //Verificación para rol administrador
         if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Únicamente los administradores pueden realizar esta acción' });
+        createCategoryDefault();
 
-        //Método para eliminar la categoria
-        categoryModel.findByIdAndDelete(idCategory, (er, categoryDeleted)=>{
-            if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error en el sistema' });
-            if(!categoryDeleted) return res.status(500).send({ mensaje: 'Perdón, no hemos podido ninguna categoria con ese id, revisalo' });
-            //Mostramos la categoria eliminada
-            return res.status(200).send({ 'Categoria eliminada' : categoryDeleted  });
-        } )
+        //Buscar la categoria por default
+        categoryModel.findOne({ name: "default" }, (er, cDefaultFound)=>{
+            //Método para eliminar la categoria
+            categoryModel.findByIdAndDelete(idCategory, (er, categoryDeleted)=>{
+                if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error en el sistema' });
+                if(!categoryDeleted) return res.status(500).send({ mensaje: 'Perdón, no hemos podido ninguna categoria con ese id, revísalo' });
+                //Buscamos los productos que colleven la categoria eliminada
+                productModel.find({ categoryId : idCategory }).exec((er, productsFound)=>{
+                    productsFound.forEach((categoryDefault)=>{
+                        productModel.findByIdAndUpdate(categoryDefault._id, { categoryId: cDefaultFound }, (er, updated)=>{
+                        });
+                    });
+                });
+                //Mostramos la categoria eliminada
+                return res.status(200).send({ 'Categoria eliminada' : categoryDeleted  });
+            }); 
+        });
     }
 
+module.exports ={
+    createCategory,
+    listCategorys,
+    editCategory,
+    deleteCategory
 }
+
+ 

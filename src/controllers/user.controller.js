@@ -2,8 +2,10 @@
 
 //Imports
 const userModel = require('../models/user.model');
+const cartController = require('../controllers/cart.controller');
 const bcrypt = require('bcrypt-nodejs');
 const jwt = require('../services/jwt');
+const cartModel = require('../models/cart.model');
 
 //Exportamos las funciones
 module.exports = {
@@ -28,6 +30,7 @@ registryUser: function(req, res){
 
                 userBuilder.save((er, userSaved)=>{
                     if(userSaved){
+                        cartController.createCart(userSaved._id);
                         res.status(500).send({ 'Usuario guardado': userSaved });
                     }else{
                         res.status(500).send({ mensaje: 'No se ha podido registrar el usuario' });  
@@ -96,6 +99,7 @@ createUser: function(req, res){
                         if(er) return res.status(500).send({ mensaje: 'error al guardar el usuario' });
 
                         if(userSaved){
+                            cartController.createCart(userSaved._id);
                             res.status(200).send(userSaved);
                         }else{
                             res.status(404).send({ mensaje: 'No se ha podido crear el usuario' });
@@ -161,6 +165,8 @@ editUser: function(req, res){
         return res.status(200).send({ 'Usuario actualizado' : userUpdated });
     });
 }
+
+
 
 }
 
