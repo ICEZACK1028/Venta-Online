@@ -9,7 +9,7 @@ var ProductSchema = Schema({
     stock: Number,
     price: Number,
     categoryId: {type: Schema.Types.ObjectId, ref: 'categorys'},
-    soldOut: Number
+    sold: Number
 });
 
 //Export
