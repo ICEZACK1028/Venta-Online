@@ -3,7 +3,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 const Users = require('./src/models/user.model');
-const Categorys = require('./src/models/category.model');
 const app = require('./app');
 
 mongoose.Promise = global.Promise;
@@ -35,31 +34,6 @@ mongoose.connect('mongodb://localhost:27017/VentaOnline', { useNewUrlParser: tru
                 })
             })
 
-        }
-    })
-
-    var Category = new Categorys();
-    var name = 'default';
-    var description = '';
-
-    Category.name = name;
-    Category.description = description;
-
-    Categorys.find({ name: Category.name }).exec((er, categoryFound)=>{
-        if(er) return res.status(500).send({ mensaje: '¡Error!' });
-
-        if(categoryFound && categoryFound.length >=1){
-            return console.log( 'Category default already exist');
-        }else{
-            Category.save((er, categorySaved)=>{
-                if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error'});
-
-                if(categorySaved){
-                    return console.log({ categorySaved });
-                }else{
-                    return console.log({ mensaje: 'No se ha podido crear la categoria ' });
-                }
-            });
         }
     });
 
