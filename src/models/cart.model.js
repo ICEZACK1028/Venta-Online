@@ -9,7 +9,8 @@ var cartSchema = Schema({
     productsBt:[{
         idProduct : {type: Schema.Types.ObjectId, ref: 'products'},
         amount: Number,
-        subtotal: Number
+        price: Number,
+        subTotal: Number
     }],
     total: Number
 });  
