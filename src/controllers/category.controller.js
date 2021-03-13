@@ -104,17 +104,16 @@ const productModel = require('../models/product.model');
         if(req.user.rol != 'Administrador') return res.status(500).send({ mensaje: 'Únicamente los administradores pueden realizar esta acción' });
         createCategoryDefault();
 
-        //Buscar la categoria por default
-        categoryModel.findOne({ name: "default" }, (er, cDefaultFound)=>{
-            //Método para eliminar la categoria
-            categoryModel.findByIdAndDelete(idCategory, (er, categoryDeleted)=>{
-                if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error en el sistema' });
-                if(!categoryDeleted) return res.status(500).send({ mensaje: 'Perdón, no hemos podido ninguna categoria con ese id, revísalo' });
+        //Método para eliminar la categoria
+        categoryModel.findByIdAndDelete(idCategory, (er, categoryDeleted)=>{
+            if(er) return res.status(500).send({ mensaje: 'Ha ocurrido un error en el sistema' });
+            if(!categoryDeleted) return res.status(500).send({ mensaje: 'Perdón, no hemos podido ninguna categoria con ese id, revísalo' });
+            //Buscar la categoria por default
+            categoryModel.findOne({ name: "default" }, (er, cDefaultFound)=>{
                 //Buscamos los productos que colleven la categoria eliminada
                 productModel.find({ categoryId : idCategory }).exec((er, productsFound)=>{
                     productsFound.forEach((categoryDefault)=>{
-                        productModel.findByIdAndUpdate(categoryDefault._id, { categoryId: cDefaultFound }, (er, updated)=>{
-                        });
+                        productModel.findByIdAndUpdate(categoryDefault._id, { categoryId: cDefaultFound }, (er, updated)=>{});
                     });
                 });
                 //Mostramos la categoria eliminada
