@@ -20,6 +20,7 @@ module.exports = {
             productBuilder.name = params.name;
             productBuilder.stock = params.stock;
             productBuilder.price = params.price;
+            productBuilder.sold = 0;
             productBuilder.categoryId = idCategory;
 
             productModel.find({ name: productBuilder.name }).exec((er, productFound)=>{
@@ -40,7 +41,7 @@ module.exports = {
             }else{
                 return res.status(500).send({ mensaje: 'Debe llenar todos los campos para crear el producto' });
             }
-        },
+    },
         
     //Función para editar productos
     updateProduct: function(req,res){
